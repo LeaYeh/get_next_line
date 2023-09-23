@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.h                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yehya <yehya@student.42.fr>                +#+  +:+       +#+        */
+/*   By: lyeh <lyeh@student.42vienna.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/09/14 21:35:51 by yehya             #+#    #+#             */
-/*   Updated: 2022/09/14 21:38:40 by yehya            ###   ########.fr       */
+/*   Created: 2023/09/23 14:48:11 by lyeh              #+#    #+#             */
+/*   Updated: 2023/09/23 14:48:11 by lyeh             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,11 @@
 # define GET_NEXT_LINE_H
 # include <unistd.h>
 # include <stdlib.h>
+#include <fcntl.h>
+# define BUFFER_SIZE 10
 
-int	get_next_line(int fd, char **line);
+char	*ft_strchr(const char *s, int c);
+char	*ft_strjoin(char const *s1, char const *s2);
+
+int		get_next_line(int fd, char **line);
 #endif
