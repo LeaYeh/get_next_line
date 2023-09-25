@@ -6,7 +6,7 @@
 /*   By: lyeh <lyeh@student.42vienna.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/23 14:47:52 by lyeh              #+#    #+#             */
-/*   Updated: 2023/09/23 22:54:09 by lyeh             ###   ########.fr       */
+/*   Updated: 2023/09/25 23:23:59 by lyeh             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ void	*ft_memcpy(void *dst, const void *src, size_t len)
 
 char	*ft_strchr(const char *s, int c)
 {
-	while (*s)
+	while (s && *s)
 	{
 		if ((int) *s == c)
 			return ((char *) s);

@@ -6,11 +6,30 @@
 /*   By: lyeh <lyeh@student.42vienna.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/23 14:48:03 by lyeh              #+#    #+#             */
-/*   Updated: 2023/09/25 20:16:05 by lyeh             ###   ########.fr       */
+/*   Updated: 2023/09/25 23:47:09 by lyeh             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+
+void	_deep_free(char **buf1, char **buf2, char **buf3)
+{
+	if (buf1 && *buf1)
+	{
+		free(*buf1);
+		*buf1 = NULL;
+	}
+	if (buf2 && *buf2)
+	{
+		free(*buf2);
+		*buf2 = NULL;
+	}
+	if (buf3 && *buf3)
+	{
+		free(*buf3);
+		*buf3 = NULL;
+	}
+}
 
 char	*_update_buf(char *buf_save)
 {
@@ -25,7 +44,9 @@ char	*_update_buf(char *buf_save)
 	if (buf_save[i] == '\n')
 		i++;
 	ret = ft_strdup(buf_save + i);
-	free(buf_save);
+	_deep_free(&buf_save, NULL, NULL);
+	if (!ret)
+		return (NULL);
 	return (ret);
 }
 
@@ -67,18 +88,17 @@ char	*_read_to_buf(int fd, char *buf_save)
 		read_bytes = read(fd, str, BUFFER_SIZE);
 		if ((int)read_bytes < 0)
 		{
-			free(str);
-			free(buf_save);
+			_deep_free(&str, &buf_save, NULL);
 			return (NULL);
 		}
 		if (read_bytes == 0)
 			break ;
 		*(str + read_bytes) = '\0';
 		tmp = ft_strjoin(buf_save, str);
-		free(buf_save);
+		_deep_free(&buf_save, NULL, NULL);
 		buf_save = tmp;
 	}
-	free(str);
+	_deep_free(&str, NULL, NULL);
 	return (buf_save);
 }
 
@@ -90,15 +110,16 @@ char	*get_next_line(int fd)
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	buf_save = _read_to_buf(fd, buf_save);
-	// if (!buf_save)
-	// 	return (NULL);
+	if (!buf_save)
+		return (NULL);
 	line = _extract_one_line(buf_save);
 	if (!line || *line == '\0')
 	{
-		free(line);
-		free(buf_save);
+		_deep_free(&line, &buf_save, NULL);
 		return (NULL);
 	}
 	buf_save = _update_buf(buf_save);
+	if (!buf_save)
+		return (NULL);
 	return (line);
 }
