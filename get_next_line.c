@@ -6,109 +6,92 @@
 /*   By: lyeh <lyeh@student.42vienna.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/23 14:48:03 by lyeh              #+#    #+#             */
-/*   Updated: 2023/09/23 14:48:04 by lyeh             ###   ########.fr       */
+/*   Updated: 2023/09/25 18:07:41 by lyeh             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-size_t	ft_strlen(const char *str)
+char	*_update_buf(char *buf_save)
 {
-	size_t	len;
+	char	*ret;
+	int		i;
 
-	len = 0;
-	while (str[len])
-		len++;
-	return (len);
-}
-
-void	*ft_memcpy(void *restrict dst, const void *restrict src, size_t len)
-{
-	size_t	i;
-
-	if (len == 0 || dst == src)
-		return (dst);
 	i = 0;
-	while (i < len)
-	{
-		((unsigned char *) dst)[i] = ((unsigned char *) src)[i];
+	while (buf_save[i] && buf_save[i] != '\n')
 		i++;
-	}
-	return (dst);
+	
+	ret = ft_strdup(buf_save + i + 1);
+	free(buf_save);
+	return (ret);
 }
 
-char	*ft_strchr(const char *s, int c)
+char	*_extract_one_line(char *buf_save)
 {
-	while (*s)
-	{
-		if ((int) *s == c)
-			return ((char *) s);
-		s++;
-	}
-	if ((int) *s == c)
-		return ((char *) s);
-	return (NULL);
-}
+	char			*line;
+	int				len;
+	unsigned long	addr_newline;
 
-char	*ft_strjoin(char const *s1, char const *s2)
-{
-	char	*ptr;
-	size_t	s1_len;
-	size_t	s2_len;
-
-	s1_len = 0;
-	s2_len = 0;
-	if (s1)
-		s1_len = ft_strlen(s1);
-	if (s2)
-		s2_len = ft_strlen(s2);
-	ptr = (char *)malloc(sizeof(char) * (s1_len + s2_len) + 1);
-	if (!ptr)
+	addr_newline = (unsigned long)ft_strchr(buf_save, '\n');
+	if (!addr_newline)
+		return (ft_strdup(buf_save));
+	len = (int)(addr_newline - (unsigned long)buf_save + 1);
+	line = (char *)malloc(sizeof(char) * len + 1);
+	if (!line)
 		return (NULL);
-	ft_memcpy(ptr, s1, s1_len);
-	ft_memcpy(ptr + s1_len, s2, s2_len);
-	*(ptr + (s1_len + s2_len)) = '\0';
-	return (ptr);
+	line[len--] = '\0';
+	while (len >= 0)
+	{
+		line[len] = buf_save[len];
+		len--;
+	}
+	return (line);
 }
 
-static char	*_read_str(int fd, char *str)
+char	*_read_to_buf(int fd, char *buf_save)
 {
-	char	*buf;
+	char	*str;
+	char	*tmp;
 	size_t	read_bytes;
 
-	buf = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
-	if (!buf)
+	if (buf_save && ft_strchr(buf_save, '\n'))
+		return (buf_save);
+	str = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
+	if (!str)
 		return (NULL);
-	while (!ft_strchr(str, '\n'))
+	while (!buf_save || !ft_strchr(buf_save, '\n'))
 	{
-		read_bytes = read(fd, buf, BUFFER_SIZE);
+		read_bytes = read(fd, str, BUFFER_SIZE);
 		if (read_bytes < 0)
 		{
-			free(buf);
+			free(str);
 			return (NULL);
 		}
-		*(buf + read_bytes) = '\0';
-		str = ft_strjoin(str, buf);
+		if (read_bytes == 0)
+			break ;
+		*(str + read_bytes) = '\0';
+		tmp = ft_strjoin(buf_save, str);
+		free(buf_save);
+		buf_save = tmp;
 	}
-	free(buf);
-	return (str);
+	free(str);
+	return (buf_save);
 }
 
-int	get_next_line(int fd, char **line)
+char	*get_next_line(int fd)
 {
-	static char	*line_str;
+	static char	*buf_save = NULL;
+	char		*line;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
-		return (-1);
-	line_str = _read_line(fd, line_str);
-}
-
-
-int	main(void)
-{
-	int		fd;
-	char	**line;
-
-	fd = open("test1", O_RDONLY);
-	get_next_line(fd, line);
+		return (NULL);
+	buf_save = _read_to_buf(fd, buf_save);
+	if (!buf_save)
+	{
+		free(buf_save);
+		return (NULL);
+	}
+	line = _extract_one_line(buf_save);
+	buf_save = _update_buf(buf_save);
+	return (line);
 }
