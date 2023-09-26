@@ -6,7 +6,7 @@
 /*   By: lyeh <lyeh@student.42vienna.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/23 14:48:03 by lyeh              #+#    #+#             */
-/*   Updated: 2023/09/25 23:47:09 by lyeh             ###   ########.fr       */
+/*   Updated: 2023/09/26 17:04:59 by lyeh             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ char	*_read_to_buf(int fd, char *buf_save)
 {
 	char	*str;
 	char	*tmp;
-	size_t	read_bytes;
+	ssize_t	read_bytes;
 
 	str = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
 	if (!str)
@@ -86,7 +86,7 @@ char	*_read_to_buf(int fd, char *buf_save)
 	while (!buf_save || !ft_strchr(buf_save, '\n'))
 	{
 		read_bytes = read(fd, str, BUFFER_SIZE);
-		if ((int)read_bytes < 0)
+		if (read_bytes < 0)
 		{
 			_deep_free(&str, &buf_save, NULL);
 			return (NULL);
