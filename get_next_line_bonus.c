@@ -6,7 +6,7 @@
 /*   By: lyeh <lyeh@student.42vienna.com>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/23 14:48:03 by lyeh              #+#    #+#             */
-/*   Updated: 2023/09/26 16:08:30 by lyeh             ###   ########.fr       */
+/*   Updated: 2023/09/27 12:57:21 by lyeh             ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ char	*_read_to_buf(int fd, char *buf_save)
 {
 	char	*str;
 	char	*tmp;
-	size_t	read_bytes;
+	ssize_t	read_bytes;
 
 	str = (char *)malloc(sizeof(char) * BUFFER_SIZE + 1);
 	if (!str)
